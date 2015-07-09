@@ -134,6 +134,7 @@ public class MemoryMapWindows implements MemoryMap {
     public void resize(long size) throws IOException {
         List<MemoryView> vs = _unmapViews();
         Kernel32.INSTANCE.CloseHandle(mapping);
+        mapping = null;
         openMapping(size);
         _remapViews(vs);
     }
