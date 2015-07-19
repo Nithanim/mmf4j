@@ -1,5 +1,6 @@
 package me.nithanim.mmf4j;
 
+import me.nithanim.mmf4j.buffers.MemoryMappedByteBufFactory;
 import com.sun.jna.Pointer;
 import com.sun.jna.platform.win32.Kernel32;
 import com.sun.jna.platform.win32.WinBase;
@@ -12,7 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class MemoryMapWindows implements MemoryMap {
+public class MemoryMapWindows extends MemoryMap {
     private static final int FILE_MAP_COPY = 0x1;
     private static final int FILE_MAP_WRITE = 0x2;
     private static final int FILE_MAP_READ = 0x4;
@@ -25,12 +26,17 @@ public class MemoryMapWindows implements MemoryMap {
         allocationGranularity = si.dwAllocationGranularity.longValue();
     }
 
+    private final MemoryMappedByteBufFactory byteBufFactory;
+    private final Set<MemoryView> views = new HashSet<MemoryView>();
     private String path;
     private WinNT.HANDLE file;
     private WinNT.HANDLE mapping;
     private long mapsize;
 
-    private final Set<MemoryView> views = new HashSet<MemoryView>();
+
+    MemoryMapWindows(MemoryMappedByteBufFactory byteBufFactory) {
+        this.byteBufFactory = byteBufFactory;
+    }
 
     @Override
     public void openFile(String path) throws IOException {
@@ -93,13 +99,13 @@ public class MemoryMapWindows implements MemoryMap {
         int pageOffset = (int) (offset - nativeOffset);
         try {
             MemoryView view = openView(nativeOffset, size + pageOffset);
-            MemoryMappedByteBufImpl bb = new MemoryMappedByteBufImpl(view, pageOffset, size);
-            return bb;
+            return byteBufFactory.getInstance(view, pageOffset, size);
         } catch (MemoryMappingException ex) {
             throw new MemoryMappingException("Unable to map a new buffer! Requested was: offset: " + offset + " size: " + size + " map-size: " + mapsize, ex);
         }
     }
 
+    @Override
     void destroyView(MemoryView view) {
         Kernel32.INSTANCE.UnmapViewOfFile(view.getPointer());
         views.remove(view);

@@ -4,12 +4,12 @@ import com.sun.jna.Pointer;
 import io.netty.util.AbstractReferenceCounted;
 import java.util.Objects;
 
-class MemoryView extends AbstractReferenceCounted {
-    static MemoryView getInstance(MemoryMapWindows memoryMap, Pointer pointer, long offset, int size) {
+public class MemoryView extends AbstractReferenceCounted {
+    public static MemoryView getInstance(MemoryMap memoryMap, Pointer pointer, long offset, int size) {
         return new MemoryView(memoryMap, pointer, offset, size);
     }
 
-    private final MemoryMapWindows memoryMap;
+    private final MemoryMap memoryMap;
     private Pointer pointer;
     private final long offset;
     private final int size;
@@ -17,7 +17,7 @@ class MemoryView extends AbstractReferenceCounted {
     
     private PointerChangeListener listener;
 
-    private MemoryView(MemoryMapWindows memoryMap, Pointer pointer, long offset, int size) {
+    private MemoryView(MemoryMap memoryMap, Pointer pointer, long offset, int size) {
         this.memoryMap = memoryMap;
         this.pointer = pointer;
         this.offset = offset;

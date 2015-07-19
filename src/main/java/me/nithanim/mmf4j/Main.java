@@ -6,7 +6,7 @@ import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        MemoryMap mm = new MemoryMapWindows();
+        MemoryMap mm = MemoryMapFactory.getInstance();
         mm.openFile("./test.txt");
         mm.openMapping(1000);
         ByteBuf b = mm.mapView(20, 30);

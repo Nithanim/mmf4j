@@ -9,7 +9,7 @@ This library aims to bring memory mapped files to java. The goal is to give bett
 For each file you need to create a new MemoryMap object and give it a path to a file:
 
 ```java
-MemoryMap mm = new MemoryMapWindows();
+MemoryMap mm = MemoryMapFactory.getInstance();
 mm.openFile("./test.txt");
 ```
 

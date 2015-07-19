@@ -37,13 +37,13 @@ import java.io.IOException;
  * everything when resizing the map. This is a costly operation and should be
  * used only if neccessary.
  */
-public interface MemoryMap {
+public abstract class MemoryMap {
 
     /**
      * Closes the memory map completely by freeing all views and closing the
      * file.
      */
-    void close();
+    public abstract void close();
 
     /**
      * Creates a new {@link MemoryMappedByteBuf} that represents and allows
@@ -57,13 +57,13 @@ public interface MemoryMap {
      * @return a new {@link MemoryMappedByteBuf} that gives access to size bytes
      * of the file starting at offset
      */
-    ByteBuf mapView(long offset, int size);
+    public abstract ByteBuf mapView(long offset, int size);
 
-    void openFile(String path) throws IOException;
+    public abstract void openFile(String path) throws IOException;
 
-    void openMapping(long size) throws IOException;
+    public abstract void openMapping(long size) throws IOException;
 
-    void resize(long size) throws IOException;
+    public abstract void resize(long size) throws IOException;
 
     /**
      * Truncates the file to the specified size. All views that exceeds the new
@@ -73,5 +73,7 @@ public interface MemoryMap {
      * @throws IOException if it is not possible to truncate the file or to
      * remap the previously open views
      */
-    void truncateFile(long size) throws IOException;
+    public abstract void truncateFile(long size) throws IOException;
+    
+    abstract void destroyView(MemoryView view);
 }

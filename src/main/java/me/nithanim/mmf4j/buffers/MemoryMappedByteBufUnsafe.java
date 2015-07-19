@@ -1,4 +1,4 @@
-package me.nithanim.mmf4j;
+package me.nithanim.mmf4j.buffers;
 
 import com.sun.jna.Pointer;
 import io.netty.buffer.ByteBuf;
@@ -7,23 +7,38 @@ import io.netty.buffer.Unpooled;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.GatheringByteChannel;
 import java.nio.channels.ScatteringByteChannel;
+import me.nithanim.mmf4j.MemoryView;
+import sun.misc.Unsafe;
 
-public class MemoryMappedByteBufImpl extends MemoryMappedByteBuf {
+public class MemoryMappedByteBufUnsafe extends MemoryMappedByteBuf {
+    static final Unsafe unsafe;
+    static {
+        Unsafe u = null;
+        try {
+            Field singleoneInstanceField = Unsafe.class.getDeclaredField("theUnsafe");
+            singleoneInstanceField.setAccessible(true);
+            u = (Unsafe) singleoneInstanceField.get(null);
+        } catch(Throwable throwable) {
+        }
+        unsafe = u;
+    }
+    
     private final MemoryView view;
-    private Pointer pointer;
+    private long addr;
 
-    MemoryMappedByteBufImpl(MemoryView view, final int pageOffset, int size) {
+    MemoryMappedByteBufUnsafe(MemoryView view, final int pageOffset, int size) {
         super(size);
         this.view = view;
 
         MemoryView.PointerChangeListener pcl = new MemoryView.PointerChangeListener() {
             @Override
             public void onPointerChange(Pointer p) {
-                pointer = p.share(pageOffset);
+                addr = Pointer.nativeValue(p) + pageOffset;
             }
         };
         view.setPointerChangeListener(pcl);
@@ -32,42 +47,42 @@ public class MemoryMappedByteBufImpl extends MemoryMappedByteBuf {
 
     @Override
     public byte _getByte(int index) {
-        return pointer.getByte(index);
+        return unsafe.getByte(addr + index);
     }
 
     @Override
     public short _getShort(int index) {
-        return pointer.getShort(index);
+        return unsafe.getShort(addr + index);
     }
 
     @Override
     protected int _getInt(int index) {
-        return pointer.getInt(index);
+        return unsafe.getInt(addr + index);
     }
 
     @Override
     protected long _getLong(int index) {
-        return pointer.getLong(index);
+        return unsafe.getLong(addr + index);
     }
 
     @Override
     public void _setByte(int index, int value) {
-        pointer.setByte(index, (byte) value);
+        unsafe.putByte(addr + index, (byte) value);
     }
 
     @Override
     protected void _setShort(int index, int value) {
-        pointer.setShort(index, (short) value);
+        unsafe.putShort(addr + index, (short) value);
     }
 
     @Override
     protected void _setInt(int index, int value) {
-        pointer.setInt(index, value);
+        unsafe.putInt(addr + index, value);
     }
 
     @Override
     protected void _setLong(int index, long value) {
-        pointer.setLong(index, value);
+        unsafe.putLong(addr + index, value);
     }
 
     @Override
@@ -97,7 +112,7 @@ public class MemoryMappedByteBufImpl extends MemoryMappedByteBuf {
 
     @Override
     public ByteOrder order() {
-        return ByteOrder.BIG_ENDIAN;
+        return ByteOrder.nativeOrder();
     }
 
     @Override
@@ -134,7 +149,10 @@ public class MemoryMappedByteBufImpl extends MemoryMappedByteBuf {
 
     @Override
     public ByteBuf getBytes(int index, byte[] dst, int dstIndex, int length) {
-        pointer.read(index, dst, dstIndex, length);
+        long offset = addr + index;
+        for(int i = 0; i < length; i++) {
+            dst[dstIndex + i] = unsafe.getByte(offset + i);
+        }
         return this;
     }
 
@@ -177,7 +195,10 @@ public class MemoryMappedByteBufImpl extends MemoryMappedByteBuf {
 
     @Override
     public ByteBuf setBytes(int index, byte[] src, int srcIndex, int length) {
-        pointer.write(index, src, srcIndex, length);
+        long offset = addr + index;
+        for(int i = 0; i < length; i++) {
+            unsafe.putByte(offset + i, src[srcIndex + i]);
+        }
         return this;
     }
 
@@ -200,9 +221,9 @@ public class MemoryMappedByteBufImpl extends MemoryMappedByteBuf {
     public ByteBuf copy(int index, int length) {
         checkIndex(index, length);
         ByteBuf bb = Unpooled.directBuffer(length);
-        Pointer src = pointer;
-        Pointer dest = new Pointer(bb.memoryAddress()); //Native.getDirectBufferPointer(bb.nioBuffer());
-        MemoryUtils.INSTANCE.nativeCopy(src, index, dest, 0, length);
+        long src = addr;
+        long dest = bb.memoryAddress();
+        unsafe.copyMemory(src, dest, length);
         return bb;
     }
 
@@ -243,16 +264,11 @@ public class MemoryMappedByteBufImpl extends MemoryMappedByteBuf {
 
     @Override
     public long memoryAddress() {
-        return Pointer.nativeValue(pointer);
+        return addr;
     }
 
     @Override
     protected void deallocate() {
         view.release();
-    }
-
-    @Override
-    public Pointer getPointer() {
-        return pointer;
     }
 }
