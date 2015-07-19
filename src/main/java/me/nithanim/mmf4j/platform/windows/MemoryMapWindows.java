@@ -1,4 +1,4 @@
-package me.nithanim.mmf4j;
+package me.nithanim.mmf4j.platform.windows;
 
 import me.nithanim.mmf4j.buffers.MemoryMappedByteBufFactory;
 import com.sun.jna.Pointer;
@@ -12,6 +12,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import me.nithanim.mmf4j.MemoryMap;
+import me.nithanim.mmf4j.MemoryMappingException;
+import me.nithanim.mmf4j.MemoryView;
 
 public class MemoryMapWindows extends MemoryMap {
     private static final int FILE_MAP_COPY = 0x1;
@@ -34,7 +37,7 @@ public class MemoryMapWindows extends MemoryMap {
     private long mapsize;
 
 
-    MemoryMapWindows(MemoryMappedByteBufFactory byteBufFactory) {
+    public MemoryMapWindows(MemoryMappedByteBufFactory byteBufFactory) {
         this.byteBufFactory = byteBufFactory;
     }
 
@@ -106,7 +109,7 @@ public class MemoryMapWindows extends MemoryMap {
     }
 
     @Override
-    void destroyView(MemoryView view) {
+    public void destroyView(MemoryView view) {
         Kernel32.INSTANCE.UnmapViewOfFile(view.getPointer());
         views.remove(view);
     }
@@ -184,7 +187,7 @@ public class MemoryMapWindows extends MemoryMap {
         List<MemoryView> vs = new ArrayList<MemoryView>(views.size()); //hash changes
 
         for (MemoryView view : views) {
-            view.setValid(false);
+            setViewValid(view, false);
             Kernel32.INSTANCE.UnmapViewOfFile(view.getPointer());
             vs.add(view);
         }
@@ -196,7 +199,7 @@ public class MemoryMapWindows extends MemoryMap {
         for (MemoryView view : vs) {
             Pointer p = getViewPointer(view.getOffset(), view.getSize());
             view.setPointer(p);
-            view.setValid(true);
+            setViewValid(view, true);
             views.add(view);
         }
     }

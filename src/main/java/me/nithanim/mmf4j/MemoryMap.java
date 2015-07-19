@@ -75,5 +75,9 @@ public abstract class MemoryMap {
      */
     public abstract void truncateFile(long size) throws IOException;
     
-    abstract void destroyView(MemoryView view);
+    protected abstract void destroyView(MemoryView view);
+    
+    protected void setViewValid(MemoryView view, boolean valid) {
+        view.setValid(valid);
+    }
 }

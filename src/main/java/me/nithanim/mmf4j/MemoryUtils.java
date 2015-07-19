@@ -1,5 +1,6 @@
 package me.nithanim.mmf4j;
 
+import me.nithanim.mmf4j.platform.windows.MemoryUtilsWindows;
 import com.sun.jna.Pointer;
 
 public abstract class MemoryUtils {

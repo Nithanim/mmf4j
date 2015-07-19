@@ -48,7 +48,7 @@ public class MemoryView extends AbstractReferenceCounted {
     public boolean isValid() {
         return valid;
     }
-
+    
     void setValid(boolean valid) {
         this.valid = valid;
     }

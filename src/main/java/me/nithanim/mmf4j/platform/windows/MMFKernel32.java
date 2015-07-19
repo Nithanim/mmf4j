@@ -1,4 +1,4 @@
-package me.nithanim.mmf4j;
+package me.nithanim.mmf4j.platform.windows;
 
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;

@@ -1,7 +1,9 @@
-package me.nithanim.mmf4j;
+package me.nithanim.mmf4j.buffers;
 
 import io.netty.buffer.ByteBuf;
 import java.io.IOException;
+import me.nithanim.mmf4j.MemoryMap;
+import me.nithanim.mmf4j.MemoryView;
 
 public class MemoryMapDummy extends MemoryMap {
 
@@ -31,6 +33,6 @@ public class MemoryMapDummy extends MemoryMap {
     }
 
     @Override
-    void destroyView(MemoryView view) {
+    protected void destroyView(MemoryView view) {
     }
 }

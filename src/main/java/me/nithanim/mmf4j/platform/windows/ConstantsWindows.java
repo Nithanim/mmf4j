@@ -1,4 +1,4 @@
-package me.nithanim.mmf4j;
+package me.nithanim.mmf4j.platform.windows;
 
 public abstract class ConstantsWindows {
     private static final int FILE_MAP_COPY = 0x1;

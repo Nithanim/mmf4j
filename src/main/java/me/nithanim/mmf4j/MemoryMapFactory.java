@@ -1,5 +1,6 @@
 package me.nithanim.mmf4j;
 
+import me.nithanim.mmf4j.platform.windows.MemoryMapWindows;
 import me.nithanim.mmf4j.buffers.MemoryMappedByteBufFactory;
 import com.sun.jna.Platform;
 

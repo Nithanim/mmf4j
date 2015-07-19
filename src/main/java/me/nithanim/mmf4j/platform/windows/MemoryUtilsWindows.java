@@ -1,6 +1,7 @@
-package me.nithanim.mmf4j;
+package me.nithanim.mmf4j.platform.windows;
 
 import com.sun.jna.Pointer;
+import me.nithanim.mmf4j.MemoryUtils;
 
 public class MemoryUtilsWindows extends MemoryUtils {
     /**

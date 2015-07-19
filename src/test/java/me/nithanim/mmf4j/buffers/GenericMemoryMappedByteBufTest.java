@@ -2,7 +2,6 @@ package me.nithanim.mmf4j.buffers;
 
 import com.sun.jna.Pointer;
 import java.lang.reflect.Field;
-import me.nithanim.mmf4j.MemoryMapDummy;
 import me.nithanim.mmf4j.MemoryView;
 import org.junit.After;
 import org.junit.AfterClass;
