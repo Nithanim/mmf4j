@@ -1,6 +1,8 @@
 package me.nithanim.mmf4j.buffers;
 
 import com.sun.jna.Pointer;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import java.lang.reflect.Field;
 import me.nithanim.mmf4j.MemoryView;
 import org.junit.After;
@@ -134,33 +136,69 @@ public abstract class GenericMemoryMappedByteBufTest {
         MemoryMappedByteBuf bb = genByteBuf(view, 10, 10);
         byte[] expected;
         byte[] actual;
-        
+
         expected = new byte[] {10, 11, 12, 13, 14};
         actual = new byte[5];
         bb.getBytes(0, actual);
         assertArrayEquals(expected, actual);
-        
+
         expected = new byte[] {13, 14, 15, 16, 17};
         bb.getBytes(3, actual);
         assertArrayEquals(expected, actual);
     }
-    
+
     @Test
     public void testSetBytesArray() throws Exception {
         MemoryMappedByteBuf bb = genByteBuf(view, 10, 10);
         byte[] expected;
         byte[] actual;
-        
+
         expected = new byte[] {45, 23, 58, 7, 24};
         actual = new byte[5];
         bb.setBytes(0, expected);
         bb.getBytes(0, actual);
         assertEquals(45, bb.getByte(0));
         assertArrayEquals(expected, actual);
-        
+
         expected = new byte[] {58, 7, 24, 25, 3};
         bb.setBytes(2, expected);
         bb.getBytes(2, actual);
         assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    public void testSetBytesByteBuf() throws Exception {
+        MemoryMappedByteBuf bb = genByteBuf(view, 10, 10);
+        ByteBuf source = Unpooled.wrappedBuffer(new byte[] {45, 63, 27, 9, 12, 35});
+        bb.setBytes(2, source);
+
+        byte[] actual = new byte[10];
+        bb.getBytes(0, actual);
+        assertArrayEquals(new byte[] {10, 11, 45, 63, 27, 9, 12, 35, 18, 19}, actual);
+    }
+
+    @Test
+    public void testCopy() throws Exception {
+        MemoryMappedByteBuf bb = genByteBuf(view, 10, 10);
+        ByteBuf copy = bb.copy(2, 6);
+
+        bb.setByte(2, 65).setByte(3, 53);
+        copy.setByte(0, 23).setByte(1, 66);
+        assertEquals(65, bb.getByte(2));
+        assertEquals(53, bb.getByte(3));
+        assertEquals(23, copy.getByte(0));
+        assertEquals(66, copy.getByte(1));
+    }
+
+    @Test
+    public void testMemoryAddressBegin() throws Exception {
+        MemoryMappedByteBuf bb = genByteBuf(view, 0, 10);
+        assertEquals(workingMemory, bb.memoryAddress());
+    }
+
+    @Test
+    public void testMemoryAddressArbitrary() throws Exception {
+        MemoryMappedByteBuf bb = genByteBuf(view, 10, 10);
+        assertEquals(workingMemory + 10, bb.memoryAddress());
     }
 }
