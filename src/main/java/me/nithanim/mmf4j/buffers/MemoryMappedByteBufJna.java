@@ -162,13 +162,13 @@ public class MemoryMappedByteBufJna extends MemoryMappedByteBuf {
         int bytes = length - (longs * 8);
 
         while (longs > 0) {
-            this.setLong(index, getLong(srcIndex));
+            this.setLong(index, src.getLong(srcIndex));
             index += Long.SIZE / 8;
             srcIndex += Long.SIZE / 8;
             longs--;
         }
         while (bytes > 0) {
-            this.setByte(index, getByte(srcIndex));
+            this.setByte(index, src.getByte(srcIndex));
             index++;
             srcIndex++;
             bytes--;
