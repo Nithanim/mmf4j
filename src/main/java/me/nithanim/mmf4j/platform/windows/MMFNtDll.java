@@ -24,6 +24,17 @@ public interface MMFNtDll extends NtDll {
     void RtlCopyMemory(Pointer destination, Pointer source, int length);
 
     /**
+     * Same as
+     * {@link #RtlCopyMemory(com.sun.jna.Pointer, com.sun.jna.Pointer, int)},
+     * only with raw addresses instead of {@link Pointer}s.
+     *
+     * @param destination
+     * @param source
+     * @param length
+     */
+    void RtlCopyMemory(long destination, long source, int length);
+
+    /**
      * The RtlMoveMemory routine copies the contents of a source memory block to
      * a destination memory block, and supports overlapping source and
      * destination memory blocks.
@@ -34,8 +45,9 @@ public interface MMFNtDll extends NtDll {
      * from.
      * @param length The number of bytes to copy from the source to the
      * destination.
-     * 
-     * @see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ff562030%28v=vs.85%29.aspx">MSDN</a>
+     *
+     * @see
+     * <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ff562030%28v=vs.85%29.aspx">MSDN</a>
      */
     void RtlMoveMemory(Pointer destination, Pointer source, int length);
 }

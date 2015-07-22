@@ -156,24 +156,8 @@ public class MemoryMappedByteBufJna extends MemoryMappedByteBuf {
     }
 
     @Override
-    public ByteBuf setBytes(int index, ByteBuf src, int srcIndex, int length) {
-        // TODO probably not so efficient; copy native if possible
-        int longs = length / 8;
-        int bytes = length - (longs * 8);
-
-        while (longs > 0) {
-            this.setLong(index, src.getLong(srcIndex));
-            index += Long.SIZE / 8;
-            srcIndex += Long.SIZE / 8;
-            longs--;
-        }
-        while (bytes > 0) {
-            this.setByte(index, src.getByte(srcIndex));
-            index++;
-            srcIndex++;
-            bytes--;
-        }
-
+    protected ByteBuf setBytesNatively(int index, long srcAddr, int srcIndex, int length) {
+        MemoryUtils.INSTANCE.nativeCopy(srcAddr, srcIndex, Pointer.nativeValue(pointer), index, length);
         return this;
     }
 

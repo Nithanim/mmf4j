@@ -25,4 +25,17 @@ public abstract class MemoryUtils {
      * @param length the amount of bytes to copy from src to dest
      */
     public abstract void nativeCopy(Pointer src, long srcIndex, Pointer dest, long destIndex, int length);
+
+    /**
+     * Behaves exactly like
+     * {@link #nativeCopy(com.sun.jna.Pointer, long, com.sun.jna.Pointer, long, int)}
+     * except it uses raw addresses instead of Pointers.
+     *
+     * @param srcAddr the base address of the source to copy from
+     * @param srcIndex the offset of the base address to copy from
+     * @param destAddr the base address of the destination to write to
+     * @param destIndex the offset of the base address to write to
+     * @param length the number of bytes to copy from src to dest
+     */
+    public abstract void nativeCopy(long srcAddr, long srcIndex, long destAddr, long destIndex, int length);
 }
