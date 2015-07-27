@@ -59,24 +59,60 @@ public abstract class MemoryMap {
      */
     public abstract ByteBuf mapView(long offset, int size);
 
+    /**
+     * Initializes this MemoryMap by opening the the given file. This step is
+     * followed by {@link #openMapping(long)}.
+     *
+     * @param path The path to the file
+     * @throws IOException on any error during opening the file
+     */
     public abstract void openFile(String path) throws IOException;
 
+    /**
+     * Ensures access to the specified size starting at the beginning of the
+     * file. This is the area that is mappable to memory later on. If you only
+     * want to read you can simply specify the size of the file as the size. If
+     * you need write-access beyond the current file-size you need a good guess
+     * of the target size that you must specify now. As soon as the mapping is
+     * established it cannot be resized anymore. This means that you should not
+     * guess it too small since you cannot create a view of the data outside the
+     * mapping. BEWARE that the file is extended to the specified size and must
+     * be trimmed to the right size afterwards.
+     *
+     * @param size the amount of bytes that sould be accessible as views
+     * @throws IOException
+     */
     public abstract void openMapping(long size) throws IOException;
 
+    /**
+     * Attempts to resize the currently open mapping. This operation might be
+     * costly since it is not possible to resize a memorymap. If it is no
+     * possible to resize with a native call, the memorymap and all its views
+     * are closed and then rebuilt. This operation is completely transparent to
+     * the application using this library because all buffers are updated and
+     * remapped. In other words: Every existing buffer before the resize
+     * operation is completely functioning as nothing had happened.
+     *
+     * @param size the new size the file should be resized to
+     * @throws IOException
+     */
     public abstract void resize(long size) throws IOException;
 
     /**
      * Truncates the file to the specified size. All views that exceeds the new
-     * size need to be unmapped beforehand!
+     * size need to be unmapped beforehand. This operation is completely
+     * transparent to the code using this library since every existing buffer
+     * beforehand is still valid after the truncation. This operation needs to
+     * be done before closing te file to set it to the desired file size.
      *
      * @param size the new size of the file
      * @throws IOException if it is not possible to truncate the file or to
      * remap the previously open views
      */
     public abstract void truncateFile(long size) throws IOException;
-    
+
     protected abstract void destroyView(MemoryView view);
-    
+
     protected void setViewValid(MemoryView view, boolean valid) {
         view.setValid(valid);
     }

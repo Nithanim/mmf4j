@@ -6,48 +6,32 @@ import com.sun.jna.platform.win32.Kernel32;
 import com.sun.jna.platform.win32.WinBase;
 import com.sun.jna.platform.win32.WinError;
 import com.sun.jna.platform.win32.WinNT;
-import io.netty.buffer.ByteBuf;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import me.nithanim.mmf4j.MemoryMap;
-import me.nithanim.mmf4j.MemoryMappingException;
-import me.nithanim.mmf4j.MemoryView;
+import me.nithanim.mmf4j.MemoryMapBase;
 
-public class MemoryMapWindows extends MemoryMap {
+public class MemoryMapWindows extends MemoryMapBase {
     private static final int FILE_MAP_COPY = 0x1;
     private static final int FILE_MAP_WRITE = 0x2;
     private static final int FILE_MAP_READ = 0x4;
 
-    public static final long allocationGranularity;
-
-    static {
-        WinBase.SYSTEM_INFO si = new WinBase.SYSTEM_INFO();
-        Kernel32.INSTANCE.GetSystemInfo(si);
-        allocationGranularity = si.dwAllocationGranularity.longValue();
-    }
-
-    private final MemoryMappedByteBufFactory byteBufFactory;
-    private final Set<MemoryView> views = new HashSet<MemoryView>();
-    private String path;
     private WinNT.HANDLE file;
     private WinNT.HANDLE mapping;
-    private long mapsize;
-
 
     public MemoryMapWindows(MemoryMappedByteBufFactory byteBufFactory) {
-        this.byteBufFactory = byteBufFactory;
+        super(byteBufFactory);
+    }
+    
+    @Override
+    protected long getPageAlignment() {
+        return MemoryUtilsWindows.allocationGranularity;
     }
 
     @Override
-    public void openFile(String path) throws IOException {
+    protected void _openFile(String path) throws IOException {
         if (file != null) {
             throw new IllegalStateException("The file is already open!");
         }
 
-        this.path = path;
         file = Kernel32.INSTANCE.CreateFile(
             path,
             WinNT.GENERIC_WRITE + WinNT.GENERIC_READ,
@@ -62,12 +46,11 @@ public class MemoryMapWindows extends MemoryMap {
     }
 
     @Override
-    public void openMapping(long size) throws IOException {
+    protected void _openMapping(long size) throws IOException {
         if (mapping != null) {
             throw new IllegalStateException("File is already mapped!");
         }
 
-        this.mapsize = size;
         mapping = Kernel32.INSTANCE.CreateFileMapping(
             file,
             null,
@@ -84,133 +67,51 @@ public class MemoryMapWindows extends MemoryMap {
         }
     }
 
-    /**
-     * Creates a new {@link MemoryMappedByteBuf} that represents and allows
-     * access to the file starting at the given offset for the given size in
-     * bytes.
-     *
-     * @param offset the position in the file where the first index of the
-     * buffer starts
-     * @param size the size in bytes that the buffer gives access to starting at
-     * the offset
-     * @return a new {@link MemoryMappedByteBuf} that gives access to size bytes
-     * of the file starting at offset
-     */
     @Override
-    public ByteBuf mapView(long offset, int size) {
-        long nativeOffset = (offset / allocationGranularity) * allocationGranularity;
-        int pageOffset = (int) (offset - nativeOffset);
-        try {
-            MemoryView view = openView(nativeOffset, size + pageOffset);
-            return byteBufFactory.getInstance(view, pageOffset, size);
-        } catch (MemoryMappingException ex) {
-            throw new MemoryMappingException("Unable to map a new buffer! Requested was: offset: " + offset + " size: " + size + " map-size: " + mapsize, ex);
-        }
-    }
-
-    @Override
-    public void destroyView(MemoryView view) {
-        Kernel32.INSTANCE.UnmapViewOfFile(view.getPointer());
-        views.remove(view);
-    }
-
-    private MemoryView openView(long offset, int size) {
-        Pointer p = getViewPointer(offset, size);
-        MemoryView view = MemoryView.getInstance(this, p, offset, size);
-        views.add(view);
-        return view;
-    }
-
-    private Pointer getViewPointer(long offset, int size) {
-        if (offset + size > mapsize) {
-            throw new MemoryMappingException("View is out of bounds: offset:" + offset + " size: " + size + " map-size: " + mapsize);
-        }
-
-        Pointer p = Kernel32.INSTANCE.MapViewOfFile(
+    protected Pointer _getViewPointer(long offset, int size) {
+        return Kernel32.INSTANCE.MapViewOfFile(
             mapping,
             FILE_MAP_READ | FILE_MAP_WRITE,
             (int) (offset >> 8 * 4),
             (int) (offset & 0xFFFFFFFFL),
             size);
-        if (p == Pointer.NULL) {
-            throw new MemoryMappingException(
-                "Unable to map view; offset:" + offset + " size: " + size + " map-size: " + mapsize);
-        }
-        return p;
     }
 
     @Override
-    public void resize(long size) throws IOException {
-        List<MemoryView> vs = _unmapViews();
+    protected void _destroyView(Pointer p) {
+        Kernel32.INSTANCE.UnmapViewOfFile(p);
+    }
+
+    @Override
+    protected void _resize(long size) {
         Kernel32.INSTANCE.CloseHandle(mapping);
         mapping = null;
-        openMapping(size);
-        _remapViews(vs);
     }
-
-    /**
-     * Truncates the file to the specified size. All views that exceeds the new
-     * size need to be unmapped beforehand!
-     *
-     * @param size the new size of the file
-     * @throws IOException if it is not possible to truncate the file or to
-     * remap the previously open views
-     */
+    
     @Override
-    public void truncateFile(long size) throws IOException {
-        if (size < 0) {
-            throw new IllegalArgumentException("Size must be greater or equal zero!");
+    protected void _truncateFile(long size) throws IOException {
+        // TODO Handle lp of size
+        int resSFP = MMFKernel32.INSTANCE.SetFilePointer(file, size, Pointer.NULL, 1);
+        if (WinBase.INVALID_SET_FILE_POINTER == resSFP) {
+            throw new IOException("INVALID_SET_FILE_POINTER: " + Kernel32.INSTANCE.GetLastError());
         }
 
-        List<MemoryView> vs = _unmapViews();
-        try {
-            // TODO Handle lp of size
-            int resSFP = MMFKernel32.INSTANCE.SetFilePointer(file, size, Pointer.NULL, 1);
-            if (WinBase.INVALID_SET_FILE_POINTER == resSFP) {
-                throw new IOException("INVALID_SET_FILE_POINTER: " + Kernel32.INSTANCE.GetLastError());
-            }
+        Kernel32.INSTANCE.CloseHandle(mapping);
+        mapping = null;
 
-            Kernel32.INSTANCE.CloseHandle(mapping);
-            mapping = null;
-
-            boolean resSEOF = MMFKernel32.INSTANCE.SetEndOfFile(file);
-            if (!resSEOF) {
-                throw new IOException("Unable to SetEndOfFile: " + Kernel32.INSTANCE.GetLastError());
-            }
-        } finally {
-            openMapping(size);
-            _remapViews(vs);
+        boolean resSEOF = MMFKernel32.INSTANCE.SetEndOfFile(file);
+        if (!resSEOF) {
+            throw new IOException("Unable to SetEndOfFile: " + Kernel32.INSTANCE.GetLastError());
         }
     }
 
-    private List<MemoryView> _unmapViews() {
-        List<MemoryView> vs = new ArrayList<MemoryView>(views.size()); //hash changes
-
-        for (MemoryView view : views) {
-            setViewValid(view, false);
-            Kernel32.INSTANCE.UnmapViewOfFile(view.getPointer());
-            vs.add(view);
-        }
-        views.clear();
-        return vs;
-    }
-
-    private void _remapViews(List<MemoryView> vs) {
-        for (MemoryView view : vs) {
-            Pointer p = getViewPointer(view.getOffset(), view.getSize());
-            view.setPointer(p);
-            setViewValid(view, true);
-            views.add(view);
-        }
-    }
-
-    /**
-     * Closes the memory map completely by freeing all views and closing the
-     * file.
-     */
     @Override
-    public void close() {
-        _unmapViews();
+    protected void _unmapView(Pointer p) {
+        Kernel32.INSTANCE.UnmapViewOfFile(p);
+    }
+
+    @Override
+    protected void _close() {
         Kernel32.INSTANCE.CloseHandle(mapping);
         Kernel32.INSTANCE.CloseHandle(file);
     }

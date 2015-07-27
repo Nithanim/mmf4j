@@ -38,4 +38,6 @@ public abstract class MemoryUtils {
      * @param length the number of bytes to copy from src to dest
      */
     public abstract void nativeCopy(long srcAddr, long srcIndex, long destAddr, long destIndex, int length);
+    
+    public abstract int getPageSize();
 }
