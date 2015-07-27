@@ -1,5 +1,6 @@
 package me.nithanim.mmf4j;
 
+import com.sun.jna.Platform;
 import io.netty.buffer.ByteBuf;
 import io.netty.util.CharsetUtil;
 import java.io.IOException;
@@ -7,7 +8,7 @@ import java.io.IOException;
 public class Main {
     public static void main(String[] args) throws IOException {
         MemoryMap mm = MemoryMapFactory.getInstance();
-        mm.openFile("./test.txt");
+        mm.openFile(Platform.isWindows() ? "./test.txt" : "~/test.txt");
         mm.openMapping(1000);
         ByteBuf b = mm.mapView(20, 30);
         b.writeBytes("Hallo".getBytes(CharsetUtil.UTF_8));
