@@ -30,7 +30,7 @@ public class MemoryUtilsWindows extends MemoryUtils {
     public void nativeCopy(Pointer src, long srcIndex, Pointer dest, long destIndex, int length) {
         src = src.share(srcIndex);
         dest = dest.share(destIndex);
-        MMFNtDll.INSTANCE.RtlCopyMemory(dest, src, length);
+        MMFNtDll.RtlCopyMemory(dest, src, length);
     }
 
     /**
@@ -42,7 +42,7 @@ public class MemoryUtilsWindows extends MemoryUtils {
     public void nativeCopy(long srcAddr, long srcIndex, long destAddr, long destIndex, int length) {
         long src = srcAddr + srcIndex;
         long dest = destAddr + destIndex;
-        MMFNtDll.INSTANCE.RtlCopyMemory(dest, src, length);
+        MMFNtDll.RtlCopyMemory(dest, src, length);
     }
 
     @Override

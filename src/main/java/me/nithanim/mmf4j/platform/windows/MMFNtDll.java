@@ -2,10 +2,12 @@ package me.nithanim.mmf4j.platform.windows;
 
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
-import com.sun.jna.platform.win32.NtDll;
+import com.sun.jna.win32.StdCallLibrary;
 
-public interface MMFNtDll extends NtDll {
-    public static MMFNtDll INSTANCE = (MMFNtDll) Native.loadLibrary("kernel32", MMFNtDll.class);
+public class MMFNtDll implements StdCallLibrary {
+    static {
+        Native.register("NtDll");
+    }
 
     /**
      * The RtlCopyMemory routine copies the contents of a source memory block to
@@ -21,7 +23,7 @@ public interface MMFNtDll extends NtDll {
      * @see
      * <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ff561808%28v=vs.85%29.aspx">MSDN</a>
      */
-    void RtlCopyMemory(Pointer destination, Pointer source, int length);
+    public static native void RtlCopyMemory(Pointer destination, Pointer source, int length);
 
     /**
      * Same as
@@ -32,7 +34,7 @@ public interface MMFNtDll extends NtDll {
      * @param source
      * @param length
      */
-    void RtlCopyMemory(long destination, long source, int length);
+    public static native void RtlCopyMemory(long destination, long source, int length);
 
     /**
      * The RtlMoveMemory routine copies the contents of a source memory block to
@@ -49,5 +51,5 @@ public interface MMFNtDll extends NtDll {
      * @see
      * <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/ff562030%28v=vs.85%29.aspx">MSDN</a>
      */
-    void RtlMoveMemory(Pointer destination, Pointer source, int length);
+    public static native void RtlMoveMemory(Pointer destination, Pointer source, int length);
 }
