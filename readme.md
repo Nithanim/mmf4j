@@ -3,7 +3,7 @@
 ## Description
 This library aims to bring memory mapped files to java. The goal is to give better control over the creation, modification and destruction in contrast to already present MappedByteBuffer. It tries to unify the interface for using such maps on different operating systems which means that a lot of details are not possible to implement. Furthermore, there might be some cases where you might need to do tedious work that may not be required on your target platform.
 
-**This library only supports windows currently!**
+This library supports windows and linux.
 
 ## Example
 For each file you need to create a new MemoryMap object and give it a path to a file:
