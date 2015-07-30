@@ -1,15 +1,21 @@
 package me.nithanim.mmf4j;
 
+import com.sun.jna.Platform;
 import me.nithanim.mmf4j.platform.windows.MemoryUtilsWindows;
 import com.sun.jna.Pointer;
+import me.nithanim.mmf4j.platform.linux.MemoryUtilsLinux;
 
 public abstract class MemoryUtils {
     public static final MemoryUtils INSTANCE;
 
     static {
-        //if(Platform.isWindows()) {
-        INSTANCE = new MemoryUtilsWindows();
-        //}
+        if(Platform.isWindows()) {
+            INSTANCE = new MemoryUtilsWindows();
+        } else if(Platform.isLinux()) {
+            INSTANCE = new MemoryUtilsLinux();
+        } else {
+            throw new UnsatisfiedLinkError("No MemoryUtils for this OS found!");
+        }
     }
 
     /**

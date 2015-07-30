@@ -41,6 +41,13 @@ public class CLibrary implements Library {
     public static native int munmap(Pointer addr, int length);
     
     /**
+     * http://man7.org/linux/man-pages/man3/memcpy.3.html
+     */
+    public static native long memcpy(long dest, long src, int size);
+    
+    public static native Pointer memcpy(Pointer dest, Pointer src, int size);
+    
+    /**
      * http://man7.org/linux/man-pages/man2/fallocate.2.html
      */
     public static native int fallocate(int fd, int mode, long offset, long len);
@@ -54,4 +61,9 @@ public class CLibrary implements Library {
      * http://www.retran.com/beej/perrorman.html
      */
     public static native String strerror(int errnum);
+    
+    /**
+     * http://man7.org/linux/man-pages/man3/sysconf.3.html
+     */
+    public static native long sysconf(int name);
 }

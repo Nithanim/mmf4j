@@ -78,11 +78,6 @@ public class MemoryMapWindows extends MemoryMapBase {
     }
 
     @Override
-    protected void _destroyView(Pointer p) {
-        Kernel32.INSTANCE.UnmapViewOfFile(p);
-    }
-
-    @Override
     protected void _resize(long size) {
         Kernel32.INSTANCE.CloseHandle(mapping);
         mapping = null;
@@ -106,7 +101,7 @@ public class MemoryMapWindows extends MemoryMapBase {
     }
 
     @Override
-    protected void _unmapView(Pointer p) {
+    protected void _unmapView(Pointer p, int size) {
         Kernel32.INSTANCE.UnmapViewOfFile(p);
     }
 

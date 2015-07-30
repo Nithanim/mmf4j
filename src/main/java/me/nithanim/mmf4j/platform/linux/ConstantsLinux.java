@@ -17,6 +17,9 @@ public abstract class ConstantsLinux {
     //http://osxr.org/linux/source/include/uapi/linux/falloc.h
     public static final int FALLOC_FL_KEEP_SIZE = 0x01;
     
+    //http://gel.sourceforge.net/examples/unistd_8h-source.php
+    public static int _SC_PAGESIZE = 47;
+    
     private ConstantsLinux() {
     }
 }

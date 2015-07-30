@@ -8,7 +8,7 @@ import java.io.IOException;
 public class Main {
     public static void main(String[] args) throws IOException {
         MemoryMap mm = MemoryMapFactory.getInstance();
-        mm.openFile(Platform.isWindows() ? "./test.txt" : "~/test.txt");
+        mm.openFile(Platform.isWindows() ? "./test.txt" : System.getProperty("user.home") + "/test.txt");
         mm.openMapping(1000);
         ByteBuf b = mm.mapView(20, 30);
         b.writeBytes("Hallo".getBytes(CharsetUtil.UTF_8));

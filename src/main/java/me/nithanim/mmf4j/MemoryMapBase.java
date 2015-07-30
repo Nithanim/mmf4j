@@ -75,11 +75,9 @@ public abstract class MemoryMapBase extends MemoryMap {
     
     @Override
     public void destroyView(MemoryView view) {
-        _destroyView(view.getPointer());
+        _unmapView(view.getPointer(), view.getSize());
         views.remove(view);
     }
-    
-    protected abstract void _destroyView(Pointer p);
 
     @Override
     public void resize(long size) throws IOException {
@@ -113,14 +111,14 @@ public abstract class MemoryMapBase extends MemoryMap {
 
         for (MemoryView view : views) {
             setViewValid(view, false);
-            _unmapView(view.getPointer());
+            _unmapView(view.getPointer(), view.getSize());
             vs.add(view);
         }
         views.clear();
         return vs;
     }
 
-    protected abstract void _unmapView(Pointer p);
+    protected abstract void _unmapView(Pointer p, int size);
 
     private void _remapViews(List<MemoryView> vs) {
         for (MemoryView view : vs) {
