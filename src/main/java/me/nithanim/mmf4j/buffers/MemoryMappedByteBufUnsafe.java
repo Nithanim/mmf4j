@@ -12,7 +12,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.GatheringByteChannel;
 import java.nio.channels.ScatteringByteChannel;
-import me.nithanim.mmf4j.MemoryUtils;
 import me.nithanim.mmf4j.MemoryView;
 import sun.misc.Unsafe;
 
@@ -22,13 +21,14 @@ import sun.misc.Unsafe;
  */
 public class MemoryMappedByteBufUnsafe extends MemoryMappedByteBuf {
     static final Unsafe unsafe;
+
     static {
         Unsafe u = null;
         try {
             Field singleoneInstanceField = Unsafe.class.getDeclaredField("theUnsafe");
             singleoneInstanceField.setAccessible(true);
             u = (Unsafe) singleoneInstanceField.get(null);
-        } catch(Throwable throwable) {
+        } catch (Throwable throwable) {
         }
         unsafe = u;
     }

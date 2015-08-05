@@ -16,14 +16,14 @@ public class Main {
         b.writerIndex(0);
         b.writeBytes("World".getBytes(CharsetUtil.UTF_8));
         b.setBytes(0, "Java".getBytes(CharsetUtil.UTF_8));
-        
+
         ByteBuf c = b.copy();
         c.setBytes(0, "AAAA".getBytes(CharsetUtil.UTF_8));
-        
+
         byte[] bytes = new byte[5];
         b.getBytes(0, bytes);
         System.out.println(new String(bytes, CharsetUtil.UTF_8));
-        
+
         b.release();
         mm.truncateFile(25);
         mm.resize(50);

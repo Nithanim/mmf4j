@@ -39,14 +39,14 @@ public class CLibrary implements Library {
      * http://linux.die.net/man/2/munmap
      */
     public static native int munmap(Pointer addr, int length);
-    
+
     /**
      * http://man7.org/linux/man-pages/man3/memcpy.3.html
      */
     public static native long memcpy(long dest, long src, int size);
-    
+
     public static native Pointer memcpy(Pointer dest, Pointer src, int size);
-    
+
     /**
      * http://man7.org/linux/man-pages/man2/fallocate.2.html
      */
@@ -56,12 +56,12 @@ public class CLibrary implements Library {
      * http://linux.die.net/man/2/truncate
      */
     public static native int ftruncate(int fd, long length);
-    
+
     /**
      * http://www.retran.com/beej/perrorman.html
      */
     public static native String strerror(int errnum);
-    
+
     /**
      * http://man7.org/linux/man-pages/man3/sysconf.3.html
      */

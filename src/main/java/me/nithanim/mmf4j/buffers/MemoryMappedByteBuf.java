@@ -15,7 +15,7 @@ public abstract class MemoryMappedByteBuf extends AbstractReferenceCountedByteBu
 
     @Override
     public ByteBuf setBytes(int index, ByteBuf src, int srcIndex, int length) {
-        if(src.hasMemoryAddress()) {
+        if (src.hasMemoryAddress()) {
             setBytesNatively(index, srcIndex, srcIndex, length);
         } else {
             setBytesPieceByPiece(index, src, srcIndex, length);

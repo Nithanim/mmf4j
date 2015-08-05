@@ -10,9 +10,9 @@ import me.nithanim.mmf4j.platform.linux.MemoryMapLinux;
  */
 public class MemoryMapFactory {
     public static MemoryMap getInstance() {
-        if(Platform.isWindows()) {
+        if (Platform.isWindows()) {
             return new MemoryMapWindows(MemoryMappedByteBufFactory.INSTANCE);
-        } else if(Platform.isLinux()) {
+        } else if (Platform.isLinux()) {
             return new MemoryMapLinux(MemoryMappedByteBufFactory.INSTANCE);
         } else {
             throw new UnsatisfiedLinkError("OS is not supported!");

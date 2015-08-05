@@ -20,7 +20,7 @@ public class MemoryMapWindows extends MemoryMapBase {
     public MemoryMapWindows(MemoryMappedByteBufFactory byteBufFactory) {
         super(byteBufFactory);
     }
-    
+
     @Override
     protected long getPageAlignment() {
         return MemoryUtilsWindows.allocationGranularity;
@@ -82,7 +82,7 @@ public class MemoryMapWindows extends MemoryMapBase {
         Kernel32.INSTANCE.CloseHandle(mapping);
         mapping = null;
     }
-    
+
     @Override
     protected void _truncateFile(long size) throws IOException {
         // TODO Handle lp of size

@@ -14,11 +14,11 @@ public class MemoryMapLinux extends MemoryMapBase {
     public MemoryMapLinux(MemoryMappedByteBufFactory byteBufFactory) {
         super(byteBufFactory);
     }
-    
+
     @Override
     protected void _openFile(String path) throws IOException {
         fd = CLibrary.open(path, O_RDWR | O_CREAT | O_APPEND, 0600);
-        if(fd == -1) {
+        if (fd == -1) {
             throw new IOException("Unable to open file \"" + path + "\":" + CLibrary.strerror(Native.getLastError()));
         }
     }
@@ -26,7 +26,7 @@ public class MemoryMapLinux extends MemoryMapBase {
     @Override
     protected void _openMapping(long size) throws IOException {
         int result = CLibrary.fallocate(fd, 0, 0, size);
-        if(result == -1) {
+        if (result == -1) {
             throw new IOException("Unable to reserve space:" + CLibrary.strerror(Native.getLastError()));
         }
     }
@@ -39,7 +39,7 @@ public class MemoryMapLinux extends MemoryMapBase {
     @Override
     protected Pointer _getViewPointer(long offset, int size) {
         Pointer p = CLibrary.mmap(Pointer.NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-        if(Pointer.nativeValue(p) == -1) {
+        if (Pointer.nativeValue(p) == -1) {
             throw new MemoryMappingException("Unable to map file: " + CLibrary.strerror(Native.getLastError()));
         }
         return p;
@@ -51,7 +51,6 @@ public class MemoryMapLinux extends MemoryMapBase {
     //@Override
     //public void resize(long size) throws IOException {
     //}
-    
     @Override
     protected void _resize(long size) {
         //no work here for linux
@@ -59,23 +58,23 @@ public class MemoryMapLinux extends MemoryMapBase {
 
     @Override
     protected void _truncateFile(long size) throws IOException {
-        if(CLibrary.ftruncate(fd, size) == -1) {
+        if (CLibrary.ftruncate(fd, size) == -1) {
             throw new MemoryMappingException("Unable to truncate file: " + CLibrary.strerror(Native.getLastError()));
         }
     }
 
     @Override
     protected void _unmapView(Pointer p, int size) {
-        if(CLibrary.munmap(p, size) == -1) {
+        if (CLibrary.munmap(p, size) == -1) {
             throw new MemoryMappingException("Unable to unmap file: " + CLibrary.strerror(Native.getLastError()));
         }
     }
 
     @Override
     protected void _close() {
-        if(CLibrary.close(fd) == -1) {
+        if (CLibrary.close(fd) == -1) {
             throw new MemoryMappingException("Unable to close file: " + CLibrary.strerror(Native.getLastError()));
         }
     }
-    
+
 }

@@ -13,7 +13,7 @@ public class MemoryUtilsWindows extends MemoryUtils {
         Kernel32.INSTANCE.GetSystemInfo(si);
         allocationGranularity = si.dwAllocationGranularity.intValue();
     }
-    
+
     /**
      * Copies the specified amount of bytes from the source to the dest. No
      * boundary checks are made so use with caution! If the memory locations
@@ -36,7 +36,8 @@ public class MemoryUtilsWindows extends MemoryUtils {
     /**
      * Behaves exactly like
      * {@link #nativeCopy(com.sun.jna.Pointer, long, com.sun.jna.Pointer, long, int)}
-     * with the exception that it uses raw addresses instead of {@link Pointer}s.
+     * with the exception that it uses raw addresses instead of
+     * {@link Pointer}s.
      */
     @Override
     public void nativeCopy(long srcAddr, long srcIndex, long destAddr, long destIndex, int length) {

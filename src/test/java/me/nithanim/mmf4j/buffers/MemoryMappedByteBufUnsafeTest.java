@@ -1,6 +1,5 @@
 package me.nithanim.mmf4j.buffers;
 
-
 import me.nithanim.mmf4j.MemoryView;
 
 public class MemoryMappedByteBufUnsafeTest extends GenericMemoryMappedByteBufTest {

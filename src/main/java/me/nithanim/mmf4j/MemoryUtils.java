@@ -25,9 +25,9 @@ public abstract class MemoryUtils {
     public static final MemoryUtils INSTANCE;
 
     static {
-        if(Platform.isWindows()) {
+        if (Platform.isWindows()) {
             INSTANCE = new MemoryUtilsWindows();
-        } else if(Platform.isLinux()) {
+        } else if (Platform.isLinux()) {
             INSTANCE = new MemoryUtilsLinux();
         } else {
             throw new UnsatisfiedLinkError("No MemoryUtils for this OS found!");

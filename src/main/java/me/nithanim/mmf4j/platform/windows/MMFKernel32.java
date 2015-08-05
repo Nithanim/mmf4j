@@ -12,7 +12,8 @@ public interface MMFKernel32 extends Kernel32 {
     boolean SetEndOfFile(WinNT.HANDLE hFile);
 
     /**
-     * @see <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa365541%28v=vs.85%29.aspx">MSDN</a>
+     * @see
+     * <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa365541%28v=vs.85%29.aspx">MSDN</a>
      */
     int SetFilePointer(WinNT.HANDLE hFile, long lDistaceToMove, Pointer lpDistanceToMoveHigh, int dwMoveMethod);
 }

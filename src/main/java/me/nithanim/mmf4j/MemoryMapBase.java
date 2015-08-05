@@ -25,7 +25,7 @@ public abstract class MemoryMapBase extends MemoryMap {
         _openFile(path);
         this.path = path;
     }
-    
+
     protected abstract void _openFile(String path) throws IOException;
 
     @Override
@@ -33,7 +33,7 @@ public abstract class MemoryMapBase extends MemoryMap {
         _openMapping(size);
         mapsize = size;
     }
-    
+
     protected abstract void _openMapping(long size) throws IOException;
 
     @Override
@@ -72,7 +72,7 @@ public abstract class MemoryMapBase extends MemoryMap {
     }
 
     protected abstract Pointer _getViewPointer(long offset, int size);
-    
+
     @Override
     public void destroyView(MemoryView view) {
         _unmapView(view.getPointer(), view.getSize());

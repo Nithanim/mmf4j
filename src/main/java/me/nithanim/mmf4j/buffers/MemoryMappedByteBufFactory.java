@@ -33,7 +33,8 @@ public class MemoryMappedByteBufFactory {
      * @param view the view to create the ByteBuf on
      * @param pageOffset the offset in the native view
      * @param size the size of the buffer starting from the given offset
-     * @return a ByteBuf that allowes access to the requested area inside the view
+     * @return a ByteBuf that allowes access to the requested area inside the
+     * view
      */
     public MemoryMappedByteBuf getInstance(MemoryView view, final int pageOffset, int size) {
         if (MemoryMappedByteBufUnsafe.unsafe != null) {
