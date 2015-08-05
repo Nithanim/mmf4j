@@ -5,6 +5,22 @@ import me.nithanim.mmf4j.platform.windows.MemoryUtilsWindows;
 import com.sun.jna.Pointer;
 import me.nithanim.mmf4j.platform.linux.MemoryUtilsLinux;
 
+/**
+ * This is a utility class that provides access to some native operations
+ * outside of the {@link MemoryMap} instance. Both of them are system dependent.
+ *
+ * <p>
+ * The intention behind this class is that the
+ * {@link me.nithanim.mmf4j.buffers.MemoryMappedByteBuf}s sometimes need native
+ * calls too but should not be dependent on the {@link MemoryMap} itself.
+ * However, MemoryUtils should not be responsible for all natives calls because
+ * it would not be a util class anymore. Additionally, the handling of the
+ * different OSs is so different on some platforms that every platform should
+ * have its own MemoryMap implementation.</p>
+ *
+ * @see MemoryMap
+ * @see me.nithanim.mmf4j.buffers.MemoryMappedByteBuf
+ */
 public abstract class MemoryUtils {
     public static final MemoryUtils INSTANCE;
 
@@ -44,6 +60,6 @@ public abstract class MemoryUtils {
      * @param length the number of bytes to copy from src to dest
      */
     public abstract void nativeCopy(long srcAddr, long srcIndex, long destAddr, long destIndex, int length);
-    
+
     public abstract int getPageSize();
 }

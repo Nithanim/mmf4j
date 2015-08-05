@@ -4,6 +4,14 @@ import com.sun.jna.Pointer;
 import io.netty.util.AbstractReferenceCounted;
 import java.util.Objects;
 
+/**
+ * The {@link MemoryView} is a wrapper around the raw memory created by a
+ * {@link MemoryMap}. It can be updated by the underlying {@link MemoryMap} if
+ * necessary.
+ *
+ * @see MemoryMap
+ * @see me.nithanim.mmf4j.buffers.MemoryMappedByteBuf
+ */
 public class MemoryView extends AbstractReferenceCounted {
     public static MemoryView getInstance(MemoryMap memoryMap, Pointer pointer, long offset, int size) {
         return new MemoryView(memoryMap, pointer, offset, size);
@@ -14,7 +22,7 @@ public class MemoryView extends AbstractReferenceCounted {
     private final long offset;
     private final int size;
     private boolean valid = true;
-    
+
     private PointerChangeListener listener;
 
     private MemoryView(MemoryMap memoryMap, Pointer pointer, long offset, int size) {
@@ -48,7 +56,7 @@ public class MemoryView extends AbstractReferenceCounted {
     public boolean isValid() {
         return valid;
     }
-    
+
     void setValid(boolean valid) {
         this.valid = valid;
     }
@@ -77,7 +85,7 @@ public class MemoryView extends AbstractReferenceCounted {
     protected void deallocate() {
         memoryMap.destroyView(this);
     }
-    
+
     public interface PointerChangeListener {
         void onPointerChange(Pointer p);
     }

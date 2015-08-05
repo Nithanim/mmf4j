@@ -3,11 +3,16 @@ package me.nithanim.mmf4j.buffers;
 import io.netty.buffer.AbstractReferenceCountedByteBuf;
 import io.netty.buffer.ByteBuf;
 
+/**
+ * The ByteBuf makes it easy to access and modify the file mapped in memory by a
+ * {@link me.nithanim.mmf4j.MemoryMap}. It is also responsible for enforcing the
+ * read/write boundaries.
+ */
 public abstract class MemoryMappedByteBuf extends AbstractReferenceCountedByteBuf {
     public MemoryMappedByteBuf(int maxCapacity) {
         super(maxCapacity);
     }
-    
+
     @Override
     public ByteBuf setBytes(int index, ByteBuf src, int srcIndex, int length) {
         if(src.hasMemoryAddress()) {
@@ -17,9 +22,9 @@ public abstract class MemoryMappedByteBuf extends AbstractReferenceCountedByteBu
         }
         return this;
     }
-    
+
     protected abstract ByteBuf setBytesNatively(int index, long srcAddr, int srcIndex, int length);
-    
+
     private ByteBuf setBytesPieceByPiece(int index, ByteBuf src, int srcIndex, int length) {
         int longs = length / 8;
         int bytes = length - (longs * 8);

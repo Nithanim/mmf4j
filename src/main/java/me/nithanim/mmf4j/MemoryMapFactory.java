@@ -5,6 +5,9 @@ import me.nithanim.mmf4j.buffers.MemoryMappedByteBufFactory;
 import com.sun.jna.Platform;
 import me.nithanim.mmf4j.platform.linux.MemoryMapLinux;
 
+/**
+ * This factory creates instances of {@link MemoryMap}s for the current OS.
+ */
 public class MemoryMapFactory {
     public static MemoryMap getInstance() {
         if(Platform.isWindows()) {
@@ -15,7 +18,7 @@ public class MemoryMapFactory {
             throw new UnsatisfiedLinkError("OS is not supported!");
         }
     }
-    
+
     private MemoryMapFactory() {
     }
 }

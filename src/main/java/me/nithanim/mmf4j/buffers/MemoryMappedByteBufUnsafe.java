@@ -16,6 +16,10 @@ import me.nithanim.mmf4j.MemoryUtils;
 import me.nithanim.mmf4j.MemoryView;
 import sun.misc.Unsafe;
 
+/**
+ * This buffer is an alternative to the native calls through JNA. It uses
+ * {@link Unsafe} already present in the JVM.
+ */
 public class MemoryMappedByteBufUnsafe extends MemoryMappedByteBuf {
     static final Unsafe unsafe;
     static {
@@ -28,7 +32,7 @@ public class MemoryMappedByteBufUnsafe extends MemoryMappedByteBuf {
         }
         unsafe = u;
     }
-    
+
     private final MemoryView view;
     private long addr;
 
@@ -151,7 +155,7 @@ public class MemoryMappedByteBufUnsafe extends MemoryMappedByteBuf {
     @Override
     public ByteBuf getBytes(int index, byte[] dst, int dstIndex, int length) {
         long offset = addr + index;
-        for(int i = 0; i < length; i++) {
+        for (int i = 0; i < length; i++) {
             dst[dstIndex + i] = unsafe.getByte(offset + i);
         }
         return this;
@@ -181,7 +185,7 @@ public class MemoryMappedByteBufUnsafe extends MemoryMappedByteBuf {
     @Override
     public ByteBuf setBytes(int index, byte[] src, int srcIndex, int length) {
         long offset = addr + index;
-        for(int i = 0; i < length; i++) {
+        for (int i = 0; i < length; i++) {
             unsafe.putByte(offset + i, src[srcIndex + i]);
         }
         return this;
