@@ -38,7 +38,7 @@ public class MemoryMapWindows extends MemoryMapBase {
             WinNT.GENERIC_WRITE + WinNT.GENERIC_READ,
             WinNT.FILE_SHARE_READ,
             null,
-            WinNT.CREATE_ALWAYS,
+            WinNT.OPEN_ALWAYS,
             WinNT.FILE_ATTRIBUTE_NORMAL,
             null);
         if (WinNT.INVALID_HANDLE_VALUE.equals(file)) {
