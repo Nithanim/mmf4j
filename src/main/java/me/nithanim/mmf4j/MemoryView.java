@@ -2,7 +2,6 @@ package me.nithanim.mmf4j;
 
 import com.sun.jna.Pointer;
 import io.netty.util.AbstractReferenceCounted;
-import java.util.Objects;
 
 /**
  * The {@link MemoryView} is a wrapper around the raw memory created by a
@@ -64,7 +63,7 @@ public class MemoryView extends AbstractReferenceCounted {
     @Override
     public int hashCode() {
         int hash = 3;
-        hash = 59 * hash + Objects.hashCode(this.pointer);
+        hash = 59 * hash + (this.pointer != null ? this.pointer.hashCode() : 0);
         hash = 59 * hash + (int) (this.offset ^ (this.offset >>> 32));
         hash = 59 * hash + this.size;
         return hash;
@@ -76,7 +75,7 @@ public class MemoryView extends AbstractReferenceCounted {
             return false;
         }
         final MemoryView other = (MemoryView) obj;
-        return Objects.equals(this.pointer, other.pointer)
+        return (this.pointer == other.pointer || (this.pointer != null && this.pointer.equals(other.pointer)))
             && this.offset == other.offset
             && this.size == other.size;
     }
