@@ -1,4 +1,4 @@
-# MemoryMappedFiles4Java
+# MemoryMappedFiles4Java [![Build Status](https://travis-ci.org/Nithanim/mmf4j.svg?branch=master)](https://travis-ci.org/Nithanim/mmf4j)
 
 ## Description
 This library aims to bring memory mapped files to java. The goal is to give better control over the creation, modification and destruction in contrast to already present MappedByteBuffer. It tries to unify the interface for using such maps on different operating systems which means that a lot of details are not possible to implement. Furthermore, there might be some cases where you might need to do tedious work that may not be required on your target platform.
