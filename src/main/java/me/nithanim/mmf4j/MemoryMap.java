@@ -38,27 +38,6 @@ import java.io.IOException;
  * used only if neccessary.
  */
 public abstract class MemoryMap {
-
-    /**
-     * Closes the memory map completely by freeing all views and closing the
-     * file.
-     */
-    public abstract void close();
-
-    /**
-     * Creates a new {@link MemoryMappedByteBuf} that represents and allows
-     * access to the file starting at the given offset for the given size in
-     * bytes.
-     *
-     * @param offset the position in the file where the first index of the
-     * buffer starts
-     * @param size the size in bytes that the buffer gives access to starting at
-     * the offset
-     * @return a new {@link MemoryMappedByteBuf} that gives access to size bytes
-     * of the file starting at offset
-     */
-    public abstract ByteBuf mapView(long offset, int size);
-
     /**
      * Initializes this MemoryMap by opening the the given file. This step is
      * followed by {@link #openMapping(long)}.
@@ -83,6 +62,20 @@ public abstract class MemoryMap {
      * @throws IOException
      */
     public abstract void openMapping(long size) throws IOException;
+
+    /**
+     * Creates a new {@link MemoryMappedByteBuf} that represents and allows
+     * access to the file starting at the given offset for the given size in
+     * bytes.
+     *
+     * @param offset the position in the file where the first index of the
+     * buffer starts
+     * @param size the size in bytes that the buffer gives access to starting at
+     * the offset
+     * @return a new {@link MemoryMappedByteBuf} that gives access to size bytes
+     * of the file starting at offset
+     */
+    public abstract ByteBuf mapView(long offset, int size);
 
     /**
      * Attempts to resize the currently open mapping. This operation might be
@@ -110,6 +103,12 @@ public abstract class MemoryMap {
      * remap the previously open views
      */
     public abstract void truncateFile(long size) throws IOException;
+
+    /**
+     * Closes the memory map completely by freeing all views and closing the
+     * file.
+     */
+    public abstract void close();
 
     protected abstract void destroyView(MemoryView view);
 

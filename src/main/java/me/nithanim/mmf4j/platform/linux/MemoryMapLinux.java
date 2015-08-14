@@ -32,11 +32,6 @@ public class MemoryMapLinux extends MemoryMapBase {
     }
 
     @Override
-    protected long getPageAlignment() {
-        return MemoryUtilsLinux.INSTANCE.getPageSize();
-    }
-
-    @Override
     protected Pointer _getViewPointer(long offset, int size) {
         Pointer p = CLibrary.mmap(Pointer.NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
         if (Pointer.nativeValue(p) == -1) {
@@ -77,4 +72,8 @@ public class MemoryMapLinux extends MemoryMapBase {
         }
     }
 
+    @Override
+    protected long getPageAlignment() {
+        return MemoryUtilsLinux.INSTANCE.getPageSize();
+    }
 }

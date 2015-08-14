@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Set;
 
 public abstract class MemoryMapBase extends MemoryMap {
-
     protected final MemoryMappedByteBufFactory byteBufFactory;
     private final Set<MemoryView> views = new HashSet<MemoryView>();
     private String path;
@@ -39,11 +38,11 @@ public abstract class MemoryMapBase extends MemoryMap {
     @Override
     public ByteBuf mapView(long offset, int size) {
         long pageAlignment = getPageAlignment();
-        long nativeOffset = (offset / pageAlignment) * pageAlignment;
-        int pageOffset = (int) (offset - nativeOffset);
+        long alignmentOffset = (offset / pageAlignment) * pageAlignment;
+        int pageInternalOffset = (int) (offset - alignmentOffset);
         try {
-            MemoryView view = openView(nativeOffset, size + pageOffset);
-            return byteBufFactory.getInstance(view, pageOffset, size);
+            MemoryView view = _mapView(alignmentOffset, size + pageInternalOffset);
+            return byteBufFactory.getInstance(view, pageInternalOffset, size);
         } catch (MemoryMappingException ex) {
             throw new MemoryMappingException("Unable to map a new buffer! Requested was: offset: " + offset + " size: " + size + " map-size: " + mapsize, ex);
         }
@@ -51,7 +50,7 @@ public abstract class MemoryMapBase extends MemoryMap {
 
     protected abstract long getPageAlignment();
 
-    private MemoryView openView(long offset, int size) {
+    private MemoryView _mapView(long offset, int size) {
         Pointer p = getViewPointer(offset, size);
         MemoryView view = MemoryView.getInstance(this, p, offset, size);
         views.add(view);

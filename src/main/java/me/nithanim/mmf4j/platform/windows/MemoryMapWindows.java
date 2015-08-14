@@ -24,11 +24,6 @@ public class MemoryMapWindows extends MemoryMapBase {
     }
 
     @Override
-    protected long getPageAlignment() {
-        return MemoryUtilsWindows.allocationGranularity;
-    }
-
-    @Override
     protected void _openFile(String path) throws IOException {
         if (file != null) {
             throw new IllegalStateException("The file is already open!");
@@ -117,6 +112,11 @@ public class MemoryMapWindows extends MemoryMapBase {
     protected void _close() {
         Kernel32.INSTANCE.CloseHandle(mapping);
         Kernel32.INSTANCE.CloseHandle(file);
+    }
+    
+    @Override
+    protected long getPageAlignment() {
+        return MemoryUtilsWindows.allocationGranularity;
     }
 
     private static String getLastErrorAsString() {
