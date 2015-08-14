@@ -9,6 +9,7 @@ import com.sun.jna.platform.win32.WinNT;
 import com.sun.jna.ptr.PointerByReference;
 import java.io.IOException;
 import me.nithanim.mmf4j.MemoryMapBase;
+import me.nithanim.mmf4j.MemoryMappingException;
 
 public class MemoryMapWindows extends MemoryMapBase {
     private static final int FILE_MAP_COPY = 0x1;
@@ -70,12 +71,17 @@ public class MemoryMapWindows extends MemoryMapBase {
 
     @Override
     protected Pointer _getViewPointer(long offset, int size) {
-        return Kernel32.INSTANCE.MapViewOfFile(
+        Pointer p = Kernel32.INSTANCE.MapViewOfFile(
             mapping,
             FILE_MAP_READ | FILE_MAP_WRITE,
             (int) (offset >> 8 * 4),
             (int) (offset & 0xFFFFFFFFL),
             size);
+        if(p == Pointer.NULL) {
+            throw new MemoryMappingException(getLastErrorAsString());
+        } else {
+            return p;
+        }
     }
 
     @Override
